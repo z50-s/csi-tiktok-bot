@@ -1,25 +1,19 @@
- import os
+import os
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
-import json, time, re
+import json
+import time
+import re
 import telebot
-from telebot import types
 
 # 🔑 التوكن من متغيرات البيئة
 BOT_TOKEN = os.environ.get('BOT_TOKEN', '8335103523:AAGznpAaYMMgBkMoN_x16T_xUyIE1wCpNAA')
 
+# إنشاء كائن البوت
 bot = telebot.TeleBot(BOT_TOKEN)
 
-print("""
-╔══════════════════════════════════════════╗
-║           🤖 CSI Social Info Bot        ║
-║             Coded By: CSI-Kr.j          ║
-║         Telegram: @CSI_Kr_j             ║
-║    For Educational Purposes Only        ║
-╚══════════════════════════════════════════╝
-🚀 البوت يعمل على السيرفر بنجاح!
-""")
+print("CSI TikTok Bot - Starting...")
 
 class CSITikTokInfo:
     def __init__(self, username: str):
@@ -28,7 +22,7 @@ class CSITikTokInfo:
         self.session = requests.Session()
     
     def get_country_name(self, region_code):
-        """تحويل رمز المنطقة إلى اسم الدولة - CSI-Kr.j"""
+        """تحويل رمز المنطقة إلى اسم الدولة"""
         countries = {
             "US": "🇺🇸 الولايات المتحدة", "SA": "🇸🇦 السعودية", "AE": "🇦🇪 الإمارات",
             "EG": "🇪🇬 مصر", "KW": "🇰🇼 الكويت", "QA": "🇶🇦 قطر", "BH": "🇧🇭 البحرين",
@@ -41,7 +35,7 @@ class CSITikTokInfo:
         return countries.get(region_code, region_code if region_code != "غير معروف" else "غير معروف")
     
     def detect_country_from_language(self, language):
-        """تخمين الدولة من اللغة - CSI-Kr.j"""
+        """تخمين الدولة من اللغة"""
         lang_to_country = {
             "ar": "🇸🇦 السعودية", "en": "🇺🇸 الولايات المتحدة", "fr": "🇫🇷 فرنسا",
             "de": "🇩🇪 ألمانيا", "es": "🇪🇸 إسبانيا", "pt": "🇧🇷 البرازيل",
@@ -52,16 +46,16 @@ class CSITikTokInfo:
         return lang_to_country.get(language, "غير معروف")
     
     def get_country_info(self, user_data):
-        """استخراج معلومات الدولة مع توضيح مصدرها - CSI-Kr.j"""
+        """استخراج معلومات الدولة"""
         user = user_data.get("user", {})
         
-        # 1. المحاولة الأولى: معلومات دقيقة من تيك توك
+        # 1. معلومات دقيقة من تيك توك
         exact_region = user.get('region') or user.get('location') or user.get('country')
         if exact_region and exact_region != "غير معروف":
             country_name = self.get_country_name(exact_region)
             return country_name, exact_region, "معلومات دقيقة من تيك توك"
         
-        # 2. المحاولة الثانية: تخمين من اللغة
+        # 2. تخمين من اللغة
         language = user.get('language')
         if language and language != "غير معروف":
             guessed_country = self.detect_country_from_language(language)
@@ -187,7 +181,7 @@ class CSITikTokInfo:
         # إضافة تحذير حول دقة معلومات الدولة
         if "تخمين" in info['country_source']:
             message += "\n⚠️ ملاحظة: معلومات الدولة بناءً على تحليل المحتوى وقد لا تكون دقيقة"
-        elif "دقيقة" في info['country_source']:
+        elif "دقيقة" in info['country_source']:
             message += "\n✅ ملاحظة: معلومات الدولة دقيقة ومستقاة من تيك توك مباشرة"
         
         return message
